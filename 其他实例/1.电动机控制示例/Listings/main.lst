@@ -1,0 +1,187 @@
+C51 COMPILER V9.54   MAIN                                                                  10/31/2024 18:26:48 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Keil5 C51\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\ma
+                    -in.lst) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          //???????:https://blog.csdn.net/weixin_59552290/article/details/122124843
+   2          
+   3          /*????????500???,??????????
+   4          ??????500???,?????????????????,???,
+   5          ????200??????????
+   6          ????200???????0.4??,
+   7          ????,500????1??,????????1???
+   8          ????,?????????
+   9          ????????????,
+  10          ????????,????DIR?????,DIR???????,???????????
+  11          ?????????????,???????,?????????*/
+  12          
+  13          #include <stc15f2k60s2.h>
+*** WARNING C318 IN LINE 13 OF main.c: can't open file 'stc15f2k60s2.h'
+  14          #include <intrins.h>
+  15          #define u8 unsigned char
+  16          #define u16 unsigned int
+  17          
+  18          unsigned int h;         //???????
+  19          
+  20          sbit maichong=P1^1;             //???????(PUL)
+*** ERROR C202 IN LINE 20 OF main.c: 'P1': undefined identifier
+  21          sbit zhuang=P0^3;               //??????(DIR)
+*** ERROR C202 IN LINE 21 OF main.c: 'P0': undefined identifier
+  22          sbit K1=P2^0;                   //????
+*** ERROR C202 IN LINE 22 OF main.c: 'P2': undefined identifier
+  23          sbit K2=P2^1;                   //??
+*** ERROR C202 IN LINE 23 OF main.c: 'P2': undefined identifier
+  24          sbit K3=P2^2;                   //????,?????????,????
+*** ERROR C202 IN LINE 24 OF main.c: 'P2': undefined identifier
+  25          sbit right=P3^2         //???
+*** ERROR C202 IN LINE 25 OF main.c: 'P3': undefined identifier
+  26          sbit left=P3^3;         //???
+*** ERROR C141 IN LINE 26 OF main.c: syntax error near 'sbit', expected ';'
+*** ERROR C202 IN LINE 26 OF main.c: 'P3': undefined identifier
+  27          sbit yuan=P0^2;         //????
+*** ERROR C202 IN LINE 27 OF main.c: 'P0': undefined identifier
+  28          
+  29          
+  30          
+  31          void Delay400us()               //400??????     
+  32          {
+  33   1              unsigned char i, j;
+  34   1      
+  35   1              i = 5;
+  36   1              j = 74;
+  37   1              do
+  38   1              {
+  39   2                      while (--j);
+  40   2              } while (--i);
+  41   1      }
+  42          
+  43          void Delay10ms()                //10??????
+  44          {
+C51 COMPILER V9.54   MAIN                                                                  10/31/2024 18:26:48 PAGE 2   
+
+  45   1              unsigned char i, j;
+  46   1      
+  47   1              i = 108;
+  48   1              j = 145;
+  49   1              do
+  50   1              {
+  51   2                      while (--j);
+  52   2              } while (--i);
+  53   1      }
+  54          
+  55          void right_EXINT0() interrupt 0         //??????0
+  56          {
+  57   1              if(right==1)
+*** ERROR C202 IN LINE 57 OF main.c: 'right': undefined identifier
+  58   1              {
+  59   2                      Delay10ms(); 
+  60   2                      if(right==1)
+*** ERROR C202 IN LINE 60 OF main.c: 'right': undefined identifier
+  61   2                      {
+  62   3                              zhuang=~zhuang;
+*** ERROR C202 IN LINE 62 OF main.c: 'zhuang': undefined identifier
+  63   3                      }
+  64   2              }
+  65   1      }
+  66                  
+  67          void left_EXINT1() interrupt 2          //??????1
+  68          {
+  69   1              if(left==1)
+*** ERROR C202 IN LINE 69 OF main.c: 'left': undefined identifier
+  70   1              {
+  71   2                      Delay10ms(); 
+  72   2              if(left==1)
+*** ERROR C202 IN LINE 72 OF main.c: 'left': undefined identifier
+  73   2                      {
+  74   3                              zhuang=~zhuang;
+*** ERROR C202 IN LINE 74 OF main.c: 'zhuang': undefined identifier
+  75   3                      }
+  76   2              }
+  77   1      }       
+  78          
+  79          void EXINT_init()                       //???????
+  80          {
+  81   1      
+  82   1              IT0=0;
+*** ERROR C202 IN LINE 82 OF main.c: 'IT0': undefined identifier
+  83   1              IT1=0;
+*** ERROR C202 IN LINE 83 OF main.c: 'IT1': undefined identifier
+  84   1              IE0=0;
+*** ERROR C202 IN LINE 84 OF main.c: 'IE0': undefined identifier
+  85   1              IE1=1;
+*** ERROR C202 IN LINE 85 OF main.c: 'IE1': undefined identifier
+  86   1              EA =1;
+*** ERROR C202 IN LINE 86 OF main.c: 'EA': undefined identifier
+  87   1              EX0=1;
+*** ERROR C202 IN LINE 87 OF main.c: 'EX0': undefined identifier
+  88   1              EX1=1;
+*** ERROR C202 IN LINE 88 OF main.c: 'EX1': undefined identifier
+  89   1      }
+  90          
+  91          void main ()                            //???
+  92          {
+  93   1              EXINT_init();
+C51 COMPILER V9.54   MAIN                                                                  10/31/2024 18:26:48 PAGE 3   
+
+  94   1              P0M0=0XFF;
+*** ERROR C202 IN LINE 94 OF main.c: 'P0M0': undefined identifier
+  95   1              P0M1=0X00;
+*** ERROR C202 IN LINE 95 OF main.c: 'P0M1': undefined identifier
+  96   1              while(1)
+  97   1               {
+  98   2                  if (K1==0)                  //??1??
+*** ERROR C202 IN LINE 98 OF main.c: 'K1': undefined identifier
+  99   2                      {
+ 100   3                               Delay10ms();   //??
+ 101   3                               if (K1==0)
+*** ERROR C202 IN LINE 101 OF main.c: 'K1': undefined identifier
+ 102   3                              {       
+ 103   4                                      for(h=0;h<500;h++) //for??500?,??500???
+ 104   4                                              {
+ 105   5                                              maichong=0;           
+*** ERROR C202 IN LINE 105 OF main.c: 'maichong': undefined identifier
+ 106   5                                              Delay400us();      
+ 107   5                                              maichong=1;            
+*** ERROR C202 IN LINE 107 OF main.c: 'maichong': undefined identifier
+ 108   5                                              Delay400us();
+ 109   5                                              }  
+ 110   4                              }               
+ 111   3                      }        
+ 112   2                      if (K2==0)                      //????2
+*** ERROR C202 IN LINE 112 OF main.c: 'K2': undefined identifier
+ 113   2                              {
+ 114   3                               Delay10ms();  //??
+ 115   3                               if (K2==0)
+*** ERROR C202 IN LINE 115 OF main.c: 'K2': undefined identifier
+ 116   3                                      {
+ 117   4                                      zhuang=~zhuang;         //??????
+*** ERROR C202 IN LINE 117 OF main.c: 'zhuang': undefined identifier
+ 118   4                                      while(K2==0);           //????????
+*** ERROR C202 IN LINE 118 OF main.c: 'K2': undefined identifier
+ 119   4                                              
+ 120   4                                      }
+ 121   3                                      
+ 122   3                              }
+ 123   2              if(K3==0)
+*** ERROR C202 IN LINE 123 OF main.c: 'K3': undefined identifier
+ 124   2              {
+ 125   3                      if(K3==0)
+*** ERROR C202 IN LINE 125 OF main.c: 'K3': undefined identifier
+ 126   3                      {
+ 127   4                              P1=0X00;
+*** ERROR C202 IN LINE 127 OF main.c: 'P1': undefined identifier
+ 128   4                      }
+ 129   3              }
+ 130   2              else{
+ 131   3                      P1=0Xff;
+*** ERROR C202 IN LINE 131 OF main.c: 'P1': undefined identifier
+ 132   3              }
+ 133   2              }
+ 134   1      }
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  36 ERROR(S)

@@ -1,0 +1,194 @@
+C51 COMPILER V9.54   MAIN                                                                  11/30/2024 11:39:20 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Keil5 C51\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\ma
+                    -in.lst) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include <INTRINS.H>
+   3          
+   4          
+   5          sbit K1 = P3^1;//改变方向
+   6          sbit K2 = P3^0;//转动一个角度
+   7          sbit K3 = P3^2;//转动另一个角度
+   8          sbit K4 = P3^3;//再转动一个角度
+   9          sbit pulse = P2^0;//定义脉冲输出脚(PUL)
+  10          sbit direction = P2^2;//定义方向引脚(DIR)
+  11          int speed = 7;//电动机初始旋转速度
+  12          int mode=0;//电机启普发生器
+  13          
+  14          void MotorControl(unsigned char Signal, int *p);
+  15          void Delay100us(unsigned int hunus);
+  16          void UART_Init();
+  17          void SendBytes(int num);
+  18          void KeyControl(int * p);
+  19          void Delay1ms(unsigned int xms);
+  20          
+  21          
+  22          //初始化串口通信以及计时器  //9600@11.0592MHz
+  23          void UART_Init() {
+  24   1              SCON=0X50;                      //设置为工作方式1,8位数据，可变波特率
+  25   1              TMOD=0X20;                      //设置计数器工作方式2
+  26   1              PCON=0X00;                      //波特率不加倍
+  27   1              TH1=0XFd;                   //计数器初始值设置
+  28   1              TL1=0XFd;
+  29   1              TR1=1;                      //打开计数器
+  30   1              ES = 1;             //开串口中断
+  31   1              EA = 1;             //开总中断
+  32   1      }
+  33          
+  34          
+  35          void main() {
+  36   1          UART_Init();//初始化定时器以及串口通信的参数
+  37   1          
+  38   1          while(1)
+  39   1          {
+  40   2              KeyControl(&speed);
+  41   2              Delay100us(1000);
+  42   2          }
+  43   1      }
+  44          
+  45          
+  46          //串口中断函数，接收到数据后跳转到此处运行
+  47          void UART_Routine()  interrupt 4    {
+  48   1          unsigned char Signal;
+  49   1          EA = 0;
+  50   1              if (RI ==  1) {
+  51   2              RI = 0;
+  52   2              Signal = SBUF;
+  53   2              MotorControl(Signal, &speed);
+  54   2          }
+C51 COMPILER V9.54   MAIN                                                                  11/30/2024 11:39:20 PAGE 2   
+
+  55   1          EA = 1;
+  56   1      }
+  57          
+  58          
+  59          /*这是电动机的控制代码，通过接受参数Signal对步进电机的转动进行控制。
+  60          若 Signal == 0x09则转换电动机的旋转方向；
+  61          否则根据Signal的大小来转一定角度*/
+  62          void MotorControl(unsigned char Signal, int *p) {
+  63   1              int h = 0;
+  64   1              int num = 0;
+  65   1      
+  66   1              switch(Signal) {
+  67   2                      case 0x01:num = 100;break;
+  68   2                      case 0x02:num = 500;break;
+  69   2              case 0x07:(*p)++;SendBytes(*p);break;//减慢一档速度
+  70   2              case 0x08:(*p)--;SendBytes(*p);break;//加快一档速度
+  71   2              case 0x09:direction = ~direction;break;//引脚状态取反,转换电动机旋转方向
+  72   2              }
+  73   1      
+  74   1          //发送总计num个脉冲，频率为1000Hz
+  75   1              for(h = 0; h < num; h++) {
+  76   2                              pulse = 0;
+  77   2                              Delay100us(*p);
+  78   2                              pulse = 1;
+  79   2                              Delay100us(*p);
+  80   2                      }
+  81   1      }
+  82          
+  83          
+  84          //@11.0592MHz//用于控制脉冲的频率，进而控制电动机的转速
+  85          void Delay100us(unsigned int hunus) {
+  86   1              unsigned char i;
+  87   1              while(hunus) {
+  88   2                      _nop_();
+  89   2                      i = 43;
+  90   2                      while (--i);
+  91   2                      hunus--;
+  92   2              }
+  93   1      }
+  94          
+  95          
+  96          void SendBytes(int num) {
+  97   1          SBUF = num;
+  98   1          while (!TI);
+  99   1          TI = 0;
+ 100   1      }
+ 101          
+ 102          
+ 103          void KeyControl(int * p) {
+ 104   1          unsigned char Signal;
+ 105   1      
+ 106   1          if(K1 == 0)
+ 107   1              {
+ 108   2                      Delay1ms(20);
+ 109   2              while(K1 == 0);
+ 110   2              Delay1ms(20);//消震
+ 111   2      
+ 112   2              Signal = 0x09;//引脚状态取反      
+ 113   2              }
+ 114   1      
+ 115   1          if(K2 == 0)
+ 116   1              {
+C51 COMPILER V9.54   MAIN                                                                  11/30/2024 11:39:20 PAGE 3   
+
+ 117   2                      Delay1ms(20);
+ 118   2              while(K2 == 0);
+ 119   2              Delay1ms(20);//消震
+ 120   2      
+ 121   2                      Signal = 0x01;
+ 122   2          }
+ 123   1      
+ 124   1          if(K3 == 0)
+ 125   1              {
+ 126   2                      Delay1ms(20);
+ 127   2              while(K3 == 0);
+ 128   2              Delay1ms(20);//消震
+ 129   2      
+ 130   2                      Signal = 0x02;
+ 131   2          }
+ 132   1      
+ 133   1          MotorControl(Signal, &speed);
+ 134   1          Signal = 0;
+ 135   1      
+ 136   1          if(K4 == 0)
+ 137   1              {
+ 138   2                      Delay1ms(20);
+ 139   2              while(K4 == 0);
+ 140   2              Delay1ms(20);//消震
+ 141   2              mode=(mode+1)%2;
+ 142   2              while (mode==1){
+ 143   3                  pulse = 0;
+ 144   3                              Delay100us(*p);
+ 145   3                              pulse = 1;
+ 146   3                              Delay100us(*p);
+ 147   3                  KeyControl(&speed);
+ 148   3              }
+ 149   2          }
+ 150   1      }
+ 151          
+ 152          void Delay1ms(unsigned int xms)         //@12.000MHz
+ 153          {
+ 154   1              unsigned char i, j;
+ 155   1      
+ 156   1          while(xms)
+ 157   1          {
+ 158   2              i = 2;
+ 159   2              j = 239;
+ 160   2              do
+ 161   2              {
+ 162   3                  while (--j);
+ 163   3              } while (--i);   
+ 164   2              xms--;
+ 165   2          }
+ 166   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    453    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      4      11
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
